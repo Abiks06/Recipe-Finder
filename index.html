@@ -1,30 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>🍳 Recipe Finder</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recipe Browser</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <header>
-    <h1>🍳 Recipe Finder</h1>
-    <p>Discover and explore delicious meals</p>
-    <button id="darkModeToggle">🌙 Dark Mode</button>
+    <h1>Your Kitchens Last Hope.</h1>
+    <p>Search, explore, and learn your next delicious recipe!</p>
   </header>
 
   <main>
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="🔍 Search for a recipe...">
-      <button onclick="searchRecipe()">Search</button>
-    </div>
+    <section id="search-section">
+      <form id="search-form">
+        <input type="text" id="search-input" placeholder="Search by name or ingredient..." />
+      </form>
+    </section>
 
-    <div id="results" class="results-grid"></div>
+    <section id="recipes-section" class="recipe-list"></section>
+    <section id="recipe-detail" class="hidden"></section>
   </main>
 
   <footer>
-    <p>Made with ❤️ by Ayomide</p>
+    <p>© 2025 Group Web Dev Project
+    </p>
+    <p>Authors: Cyril Dagher, Abikoye Emmanuel, and Warren Esonu</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
