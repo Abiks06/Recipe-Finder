@@ -32,17 +32,27 @@ const mapMealToRecipe = (meal) => {
   };
 };
 
-// GET all recipes (defaults to a generic search which returns 25 popular meals)
+// GET all recipes (fetch a rich default set by combining popular searches)
 app.get('/api/recipes', async (req, res) => {
   try {
-    const response = await fetch(`${BASE_URL}/search.php?s=`);
-    const data = await response.json();
+    const defaultSearches = ['', 'chicken', 'beef', 'cake', 'pasta'];
+    const fetchPromises = defaultSearches.map(term => 
+      fetch(`${BASE_URL}/search.php?s=${term}`).then(res => res.json())
+    );
     
-    if (!data.meals) {
-      return res.json([]);
-    }
+    const results = await Promise.all(fetchPromises);
     
-    const recipes = data.meals.map(mapMealToRecipe);
+    let allMeals = [];
+    results.forEach(data => {
+      if (data.meals) {
+        allMeals = [...allMeals, ...data.meals];
+      }
+    });
+
+    // Deduplicate by ID to ensure a clean list
+    const uniqueMeals = Array.from(new Map(allMeals.map(meal => [meal.idMeal, meal])).values());
+    
+    const recipes = uniqueMeals.map(mapMealToRecipe);
     res.json(recipes);
   } catch (err) {
     console.error(err);
