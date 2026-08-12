@@ -1,62 +1,90 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
 
 app.use(cors());
 app.use(express.json());
 
-const recipesFilePath = path.join(__dirname, 'data', 'recipes.json');
+// Helper function to map TheMealDB format to our frontend Recipe format
+const mapMealToRecipe = (meal) => {
+  if (!meal) return null;
+  
+  const ingredients = [];
+  for (let i = 1; i <= 20; i++) {
+    const ingredient = meal[`strIngredient${i}`];
+    const measure = meal[`strMeasure${i}`];
+    
+    if (ingredient && ingredient.trim() !== '') {
+      const amount = measure && measure.trim() !== '' ? measure.trim() : '';
+      ingredients.push(`${amount} ${ingredient.trim()}`.trim());
+    }
+  }
 
-// Helper to get recipes
-const getRecipes = () => {
-  const data = fs.readFileSync(recipesFilePath, 'utf8');
-  return JSON.parse(data);
+  return {
+    id: parseInt(meal.idMeal),
+    name: meal.strMeal,
+    ingredients: ingredients,
+    instructions: meal.strInstructions,
+    imageURL: meal.strMealThumb
+  };
 };
 
-// GET all recipes
-app.get('/api/recipes', (req, res) => {
+// GET all recipes (defaults to a generic search which returns 25 popular meals)
+app.get('/api/recipes', async (req, res) => {
   try {
-    const recipes = getRecipes();
+    const response = await fetch(`${BASE_URL}/search.php?s=`);
+    const data = await response.json();
+    
+    if (!data.meals) {
+      return res.json([]);
+    }
+    
+    const recipes = data.meals.map(mapMealToRecipe);
     res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Error reading recipes data' });
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching from external API' });
   }
 });
 
 // GET search recipes
-app.get('/api/recipes/search', (req, res) => {
+app.get('/api/recipes/search', async (req, res) => {
   try {
-    const term = req.query.q?.toLowerCase() || '';
-    const recipes = getRecipes();
-    const filtered = recipes.filter(
-      (r) =>
-        r.name.toLowerCase().includes(term) ||
-        r.ingredients.some((i) => i.toLowerCase().includes(term))
-    );
-    res.json(filtered);
+    const term = req.query.q || '';
+    const response = await fetch(`${BASE_URL}/search.php?s=${encodeURIComponent(term)}`);
+    const data = await response.json();
+    
+    if (!data.meals) {
+      return res.json([]);
+    }
+    
+    const recipes = data.meals.map(mapMealToRecipe);
+    res.json(recipes);
   } catch (err) {
-    res.status(500).json({ message: 'Error reading recipes data' });
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching from external API' });
   }
 });
 
 // GET recipe by ID
-app.get('/api/recipes/:id', (req, res) => {
+app.get('/api/recipes/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-    const recipes = getRecipes();
-    const recipe = recipes.find(r => r.id === id);
+    const id = req.params.id;
+    const response = await fetch(`${BASE_URL}/lookup.php?i=${id}`);
+    const data = await response.json();
     
-    if (!recipe) {
+    if (!data.meals || data.meals.length === 0) {
       return res.status(404).json({ message: 'Recipe not found' });
     }
     
+    const recipe = mapMealToRecipe(data.meals[0]);
     res.json(recipe);
   } catch (err) {
-    res.status(500).json({ message: 'Error reading recipes data' });
+    console.error(err);
+    res.status(500).json({ message: 'Error fetching from external API' });
   }
 });
 

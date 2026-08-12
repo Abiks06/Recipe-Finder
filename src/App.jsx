@@ -63,8 +63,9 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <p>© 2026 Group Web Dev Project</p>
-        <p>Authors: Cyril Dagher, Abikoye Emmanuel, and Warren Esonu</p>
+        <p>
+          Built by Ab<span className="heart-i">ı<span className="beating-heart">❤️</span></span>ks
+        </p>
       </footer>
     </div>
   );
