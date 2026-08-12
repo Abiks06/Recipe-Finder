@@ -24,8 +24,8 @@ function App() {
     setLoading(true);
     try {
       const endpoint = query 
-        ? `http://localhost:3001/api/recipes/search?q=${encodeURIComponent(query)}`
-        : 'http://localhost:3001/api/recipes';
+        ? `https://recipe-finder-w722.onrender.com/api/recipes/search?q=${encodeURIComponent(query)}`
+        : 'https://recipe-finder-w722.onrender.com/api/recipes';
         
       const response = await fetch(endpoint);
       if (!response.ok) throw new Error('Failed to fetch recipes');
