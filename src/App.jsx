@@ -23,9 +23,10 @@ function App() {
   const fetchRecipes = async (query) => {
     setLoading(true);
     try {
+      const baseUrl = import.meta.env.VITE_API_URL || 'https://recipe-finder-w722.onrender.com';
       const endpoint = query 
-        ? `https://recipe-finder-w722.onrender.com/api/recipes/search?q=${encodeURIComponent(query)}`
-        : 'https://recipe-finder-w722.onrender.com/api/recipes';
+        ? `${baseUrl}/api/recipes/search?q=${encodeURIComponent(query)}`
+        : `${baseUrl}/api/recipes`;
         
       const response = await fetch(endpoint);
       if (!response.ok) throw new Error('Failed to fetch recipes');

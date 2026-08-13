@@ -32,8 +32,17 @@ const mapMealToRecipe = (meal) => {
   };
 };
 
+// In-memory cache
+let cachedDefaultRecipes = null;
+let searchCache = new Map();
+
 // GET all recipes (fetch a rich default set by combining popular searches)
 app.get('/api/recipes', async (req, res) => {
+  if (cachedDefaultRecipes) {
+    return res.json(cachedDefaultRecipes);
+  }
+
+
   try {
     const defaultSearches = ['', 'chicken', 'beef', 'cake', 'pasta'];
     const fetchPromises = defaultSearches.map(term => 
@@ -53,6 +62,7 @@ app.get('/api/recipes', async (req, res) => {
     const uniqueMeals = Array.from(new Map(allMeals.map(meal => [meal.idMeal, meal])).values());
     
     const recipes = uniqueMeals.map(mapMealToRecipe);
+    cachedDefaultRecipes = recipes; // Save to cache
     res.json(recipes);
   } catch (err) {
     console.error(err);
@@ -64,6 +74,11 @@ app.get('/api/recipes', async (req, res) => {
 app.get('/api/recipes/search', async (req, res) => {
   try {
     const term = req.query.q || '';
+    
+    if (searchCache.has(term)) {
+      return res.json(searchCache.get(term));
+    }
+
     const response = await fetch(`${BASE_URL}/search.php?s=${encodeURIComponent(term)}`);
     const data = await response.json();
     
@@ -72,6 +87,7 @@ app.get('/api/recipes/search', async (req, res) => {
     }
     
     const recipes = data.meals.map(mapMealToRecipe);
+    searchCache.set(term, recipes); // Save to cache
     res.json(recipes);
   } catch (err) {
     console.error(err);
