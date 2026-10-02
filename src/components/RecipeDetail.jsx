@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, Youtube } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, PlayCircle } from 'lucide-react';
 
 function RecipeDetail({ recipe, onBack }) {
   // Prevent scrolling on the body when detail is open
@@ -94,7 +94,7 @@ function RecipeDetail({ recipe, onBack }) {
                 border: '1px solid var(--color-border)'
               }}
             >
-              <Youtube color="#FF0000" /> Watch Video Tutorial
+              <PlayCircle color="#FF0000" /> Watch Video Tutorial
             </a>
           </motion.div>
         )}
