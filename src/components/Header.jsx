@@ -1,14 +1,19 @@
 import React from 'react';
+import { UtensilsCrossed } from 'lucide-react';
+import SearchBar from './SearchBar';
 
-const Header = () => {
+function Header({ searchTerm, setSearchTerm }) {
   return (
     <header className="app-header">
-      <div className="header-content">
-        <h1>Your Kitchen's Last Hope.</h1>
-        <p>Search, explore, and learn your next delicious recipe!</p>
+      <div className="logo">
+        <UtensilsCrossed size={28} />
+        Recipe Finder
+      </div>
+      <div className="search-container">
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       </div>
     </header>
   );
-};
+}
 
 export default Header;

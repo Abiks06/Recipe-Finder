@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ChefHat } from 'lucide-react';
 import Header from './components/Header';
-import SearchBar from './components/SearchBar';
 import RecipeList from './components/RecipeList';
 import RecipeDetail from './components/RecipeDetail';
+import { normalizeRecipeData } from './utils/normalizeRecipeData';
 import './index.css';
 
 function App() {
@@ -10,32 +11,41 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Debounce search
   useEffect(() => {
+    // Initial load: Fetch some random recipes or a default search
+    fetchRecipes('chicken');
+  }, []);
+
+  useEffect(() => {
+    if (searchTerm === '') {
+      return;
+    }
     const timer = setTimeout(() => {
       fetchRecipes(searchTerm);
-    }, 300); // 300ms delay for debouncing
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
   const fetchRecipes = async (query) => {
     setLoading(true);
+    setError(null);
     try {
-      const baseUrl = import.meta.env.VITE_API_URL || 'https://recipe-finder-w722.onrender.com';
-      const endpoint = query 
-        ? `${baseUrl}/api/recipes/search?q=${encodeURIComponent(query)}`
-        : `${baseUrl}/api/recipes`;
-        
-      const response = await fetch(endpoint);
+      const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
       if (!response.ok) throw new Error('Failed to fetch recipes');
+      
       const data = await response.json();
-      setRecipes(data);
-    } catch (error) {
-      console.error("Error fetching recipes:", error);
-      // Fallback for demo purposes if backend isn't running
-      setRecipes([]);
+      
+      if (data.meals) {
+        setRecipes(data.meals.map(normalizeRecipeData));
+      } else {
+        setRecipes([]);
+      }
+    } catch (err) {
+      console.error("Error fetching recipes:", err);
+      setError('Something went wrong while fetching recipes.');
     } finally {
       setLoading(false);
     }
@@ -43,30 +53,27 @@ function App() {
 
   return (
     <div className="app-container">
-      <Header />
+      <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       
       <main className="main-content">
-        {selectedRecipe ? (
-          <RecipeDetail 
-            recipe={selectedRecipe} 
-            onBack={() => setSelectedRecipe(null)} 
-          />
-        ) : (
-          <>
-            <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-            <RecipeList 
-              recipes={recipes} 
-              onRecipeSelect={setSelectedRecipe} 
-              loading={loading}
-            />
-          </>
-        )}
+        <RecipeList 
+          recipes={recipes} 
+          onRecipeSelect={setSelectedRecipe} 
+          loading={loading}
+          error={error}
+          searchTerm={searchTerm}
+        />
       </main>
 
+      {selectedRecipe && (
+        <RecipeDetail 
+          recipe={selectedRecipe} 
+          onBack={() => setSelectedRecipe(null)} 
+        />
+      )}
+
       <footer className="app-footer">
-        <p>
-          Built by Ab<span className="heart-i">ı<span className="beating-heart">❤️</span></span>ks
-        </p>
+        <p>Built with <ChefHat size={16} style={{display: 'inline', margin: '0 4px', color: 'var(--color-primary)'}} /> by Abiks</p>
       </footer>
     </div>
   );

@@ -1,60 +1,106 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, CheckCircle2, Youtube } from 'lucide-react';
 
-const RecipeDetail = ({ recipe, onBack }) => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
+function RecipeDetail({ recipe, onBack }) {
+  // Prevent scrolling on the body when detail is open
+  React.useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, []);
 
-  if (!recipe) return null;
-
-  const steps = recipe.instructions
-    .split(/\d+\.\s+/)
-    .filter((step) => step.trim() !== "");
-
   return (
-    <section className="recipe-detail-container">
-      <button className="back-button" onClick={onBack}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-        Back to Recipes
+    <motion.div 
+      className="detail-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <button className="back-btn" onClick={onBack}>
+        <ArrowLeft size={24} />
       </button>
-      
-      <article className="recipe-detail-card">
-        <div className="detail-hero" style={{ backgroundImage: `url(${recipe.imageURL})` }}>
-          <div className="detail-hero-overlay"></div>
-          <h2>{recipe.name}</h2>
-        </div>
-        
-        <div className="detail-content">
-          <div className="ingredients-section">
-            <h3>Ingredients</h3>
-            <ul>
-              {recipe.ingredients.map((ingredient, index) => (
-                <li key={index}>
-                  <span className="bullet-point"></span>
-                  {ingredient}
-                </li>
-              ))}
-            </ul>
+
+      <div className="detail-image-side">
+        <motion.img 
+          src={recipe.image} 
+          alt={recipe.title} 
+          className="detail-image"
+          layoutId={`recipe-image-${recipe.id}`}
+        />
+      </div>
+
+      <div className="detail-content-side">
+        <motion.h1 
+          className="detail-title"
+          layoutId={`recipe-title-${recipe.id}`}
+        >
+          {recipe.title}
+        </motion.h1>
+
+        <motion.div 
+          className="detail-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <h3>Ingredients</h3>
+          <div className="ingredients-list">
+            {recipe.ingredients.map((ing, idx) => (
+              <div key={idx} className="ingredient-item">
+                <span className="ing-name">
+                  <CheckCircle2 size={16} style={{display: 'inline', marginRight: '8px', color: 'var(--color-primary)'}} />
+                  {ing.ingredient}
+                </span>
+                <span className="ing-measure">{ing.measure}</span>
+              </div>
+            ))}
           </div>
-          
-          <div className="instructions-section">
-            <h3>Instructions</h3>
-            <ol>
-              {steps.map((step, index) => (
-                <li key={index}>
-                  <span className="step-number">{index + 1}</span>
-                  <p>{step.trim()}</p>
-                </li>
-              ))}
-            </ol>
+        </motion.div>
+
+        <motion.div 
+          className="detail-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h3>Instructions</h3>
+          <div className="instructions-text">
+            {recipe.instructions}
           </div>
-        </div>
-      </article>
-    </section>
+        </motion.div>
+
+        {recipe.youtubeUrl && (
+          <motion.div 
+            className="detail-section"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <a 
+              href={recipe.youtubeUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: 'var(--color-text)',
+                textDecoration: 'none',
+                background: 'var(--color-surface)',
+                padding: '12px 24px',
+                borderRadius: '9999px',
+                border: '1px solid var(--color-border)'
+              }}
+            >
+              <Youtube color="#FF0000" /> Watch Video Tutorial
+            </a>
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   );
-};
+}
 
 export default RecipeDetail;
