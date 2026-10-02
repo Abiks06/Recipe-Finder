@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { ChefHat } from 'lucide-react';
-import Header from './components/Header';
-import RecipeList from './components/RecipeList';
-import RecipeDetail from './components/RecipeDetail';
-import { normalizeRecipeData } from './utils/normalizeRecipeData';
-import './index.css';
+import React, { useState, useEffect } from "react";
+import { ChefHat } from "lucide-react";
+import Header from "./components/Header";
+import RecipeList from "./components/RecipeList";
+import RecipeDetail from "./components/RecipeDetail";
+import { normalizeRecipeData } from "./utils/normalizeRecipeData";
+import "./index.css";
 
 function App() {
   const [recipes, setRecipes] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     // Initial load: Fetch some random recipes or a default search
-    fetchRecipes('chicken');
+    fetchRecipes("chicken");
   }, []);
 
   useEffect(() => {
-    if (searchTerm === '') {
+    if (searchTerm === "") {
       return;
     }
     const timer = setTimeout(() => {
@@ -33,11 +33,13 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
-      if (!response.ok) throw new Error('Failed to fetch recipes');
-      
+      const response = await fetch(
+        `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`,
+      );
+      if (!response.ok) throw new Error("Failed to fetch recipes");
+
       const data = await response.json();
-      
+
       if (data.meals) {
         setRecipes(data.meals.map(normalizeRecipeData));
       } else {
@@ -45,7 +47,7 @@ function App() {
       }
     } catch (err) {
       console.error("Error fetching recipes:", err);
-      setError('Something went wrong while fetching recipes.');
+      setError("Something went wrong while fetching recipes.");
     } finally {
       setLoading(false);
     }
@@ -54,20 +56,21 @@ function App() {
   return (
     <div className="app-container">
       <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      
+
       {!searchTerm && !loading && recipes.length > 0 && (
         <section className="hero-section">
           <h1 className="hero-title">Culinary Masterpieces</h1>
           <p className="hero-subtitle">
-            Discover and recreate the world's most exquisite dishes. Type an ingredient or dish name above to begin your journey.
+            Discover and recreate the world's most exquisite dishes. Type an
+            ingredient or dish name above to begin your journey.
           </p>
         </section>
       )}
 
       <main className="main-content">
-        <RecipeList 
-          recipes={recipes} 
-          onRecipeSelect={setSelectedRecipe} 
+        <RecipeList
+          recipes={recipes}
+          onRecipeSelect={setSelectedRecipe}
           loading={loading}
           error={error}
           searchTerm={searchTerm}
@@ -75,14 +78,25 @@ function App() {
       </main>
 
       {selectedRecipe && (
-        <RecipeDetail 
-          recipe={selectedRecipe} 
-          onBack={() => setSelectedRecipe(null)} 
+        <RecipeDetail
+          recipe={selectedRecipe}
+          onBack={() => setSelectedRecipe(null)}
         />
       )}
 
       <footer className="app-footer">
-        <p>Built with <ChefHat size={16} style={{display: 'inline', margin: '0 4px', color: 'var(--color-primary)'}} /> by Abiks & Antigravity</p>
+        <p>
+          Built with{" "}
+          <ChefHat
+            size={16}
+            style={{
+              display: "inline",
+              margin: "0 4px",
+              color: "var(--color-primary)",
+            }}
+          />{" "}
+          by Abiks
+        </p>
       </footer>
     </div>
   );
