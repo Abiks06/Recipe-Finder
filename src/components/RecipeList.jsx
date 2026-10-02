@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Loader2, FileQuestion } from 'lucide-react';
+import { FileQuestion } from 'lucide-react';
 import RecipeCard from './RecipeCard';
 
 const containerVariants = {
@@ -8,7 +8,7 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1
+      staggerChildren: 0.08
     }
   }
 };
@@ -16,9 +16,10 @@ const containerVariants = {
 function RecipeList({ recipes, onRecipeSelect, loading, error, searchTerm }) {
   if (loading) {
     return (
-      <div className="loading-container">
-        <Loader2 size={48} className="spinner" />
-        <p>Curating recipes...</p>
+      <div className="skeleton-grid">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={`skeleton-${i}`} className="skeleton-card" />
+        ))}
       </div>
     );
   }
@@ -38,14 +39,14 @@ function RecipeList({ recipes, onRecipeSelect, loading, error, searchTerm }) {
       <div className="error-container">
         <FileQuestion size={64} className="error-icon" />
         <h2>No recipes found</h2>
-        <p>We couldn't find any culinary masterpieces matching "{searchTerm}".</p>
+        <p>We couldn't find any culinary masterpieces matching "{searchTerm}". Try a different ingredient!</p>
       </div>
     );
   }
 
   return (
     <motion.div 
-      className="recipe-feed"
+      className="recipe-grid"
       variants={containerVariants}
       initial="hidden"
       animate="visible"

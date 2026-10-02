@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, PlayCircle } from 'lucide-react';
 
 function RecipeDetail({ recipe, onBack }) {
-  // Prevent scrolling on the body when detail is open
   React.useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -23,6 +22,7 @@ function RecipeDetail({ recipe, onBack }) {
       </button>
 
       <div className="detail-image-side">
+        <div className="detail-image-overlay" />
         <motion.img 
           src={recipe.image} 
           alt={recipe.title} 
@@ -32,6 +32,17 @@ function RecipeDetail({ recipe, onBack }) {
       </div>
 
       <div className="detail-content-side">
+        <motion.div 
+          className="detail-tags"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          {recipe.tags.map(tag => (
+            <span key={tag} className="tag">{tag}</span>
+          ))}
+        </motion.div>
+
         <motion.h1 
           className="detail-title"
           layoutId={`recipe-title-${recipe.id}`}
@@ -41,9 +52,9 @@ function RecipeDetail({ recipe, onBack }) {
 
         <motion.div 
           className="detail-section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, type: "spring" }}
         >
           <h3>Ingredients</h3>
           <div className="ingredients-list">
@@ -61,9 +72,9 @@ function RecipeDetail({ recipe, onBack }) {
 
         <motion.div 
           className="detail-section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, type: "spring" }}
         >
           <h3>Instructions</h3>
           <div className="instructions-text">
@@ -82,19 +93,9 @@ function RecipeDetail({ recipe, onBack }) {
               href={recipe.youtubeUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: 'var(--color-text)',
-                textDecoration: 'none',
-                background: 'var(--color-surface)',
-                padding: '12px 24px',
-                borderRadius: '9999px',
-                border: '1px solid var(--color-border)'
-              }}
+              className="video-btn"
             >
-              <PlayCircle color="#FF0000" /> Watch Video Tutorial
+              <PlayCircle color="currentColor" /> Watch Video Tutorial
             </a>
           </motion.div>
         )}

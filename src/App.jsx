@@ -55,6 +55,15 @@ function App() {
     <div className="app-container">
       <Header searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       
+      {!searchTerm && !loading && recipes.length > 0 && (
+        <section className="hero-section">
+          <h1 className="hero-title">Culinary Masterpieces</h1>
+          <p className="hero-subtitle">
+            Discover and recreate the world's most exquisite dishes. Type an ingredient or dish name above to begin your journey.
+          </p>
+        </section>
+      )}
+
       <main className="main-content">
         <RecipeList 
           recipes={recipes} 
@@ -73,7 +82,7 @@ function App() {
       )}
 
       <footer className="app-footer">
-        <p>Built with <ChefHat size={16} style={{display: 'inline', margin: '0 4px', color: 'var(--color-primary)'}} /> by Abiks</p>
+        <p>Built with <ChefHat size={16} style={{display: 'inline', margin: '0 4px', color: 'var(--color-primary)'}} /> by Abiks & Antigravity</p>
       </footer>
     </div>
   );
